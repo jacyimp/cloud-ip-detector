@@ -3,10 +3,9 @@
 [![Coverage: 100%](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://github.com/jacyimp/cloud-ip-detector/actions/workflows/ci.yml)
 [![PHPStan: max level](https://img.shields.io/badge/PHPStan-max%20level-brightgreen.svg)](https://github.com/jacyimp/cloud-ip-detector/actions/workflows/ci.yml)
 
-Identify known provider and service network ownership associated with an IP address.
+Identify known provider and service networks behind an IP address.
 
-The package works entirely offline using a bundled snapshot of the consolidated
-[`disposable/cloud-ip-ranges`](https://github.com/disposable/cloud-ip-ranges) dataset.
+Detection is fully offline using bundled IP range data.
 
 ## Installation
 
@@ -21,71 +20,98 @@ use JacyImp\CloudIpDetector\CloudIpDetector;
 use JacyImp\CloudIpDetector\Provider;
 
 $detector = new CloudIpDetector();
-$provider = $detector->detectOne('104.16.10.20');
 
-$provider === Provider::Cloudflare;
+$detector->detectOne('104.16.10.20');
+// Provider::Cloudflare
 ```
 
-Unknown infrastructure returns `null`:
+Unknown IPs return `null`:
 
 ```php
-$detector->detectOne('192.0.2.1'); // null
+$detector->detectOne('192.0.2.1');
+// null
 ```
 
-Check membership or return every possible provider for an overlapping range:
+### Multiple providers
+
+Some IP ranges belong to more than one provider or service.
 
 ```php
-$detector->belongsTo('1.178.4.1', Provider::Aws);       // true
-$detector->belongsTo('1.178.4.1', Provider::HerokuAws); // true
 $detector->detectAll('1.178.4.1');
 
-// [Provider::Aws, Provider::HerokuAws]
+// [
+//     Provider::Aws,
+//     Provider::HerokuAws,
+// ]
 ```
+
+Check membership directly:
+
+```php
+$detector->belongsTo('1.178.4.1', Provider::Aws);
+// true
+```
+
+`detectOne()` returns the most specific match. Ties are resolved deterministically by provider identifier.
 
 ## Dependency Injection
 
 Depend on `CloudIpDetectorInterface` when injecting the detector.
 
-## Supported Providers
+```php
+use JacyImp\CloudIpDetector\CloudIpDetectorInterface;
 
-All 76 provider identifiers with active rows in `disposable/cloud-ip-ranges` are supported,
-including clouds, hosting providers, CDNs, edge and security networks, SaaS products, payment
-providers, and crawlers. `Provider::cases()` is the definitive supported-provider list.
+final class RequestClassifier
+{
+    public function __construct(
+        private readonly CloudIpDetectorInterface $detector,
+    ) {
+    }
+}
+```
 
-A2 Hosting, Adyen, Ahrefs, Akamai, Alibaba, Apple Private Relay, Aruba Cloud, Atlassian, AWS, Backblaze, Bing Bot, Branch, Bunny CDN, Bunny Magic Containers, Choopa, CircleCI, Cisco Webex, Cloudflare, Cyso Cloud, Datadog, DigitalOcean, DreamHost, Equinix Metal, Exoscale, Fastly, Fly.io, Gcore CDN, Gcore Cloud, GitHub, GitLab, GoDaddy, Google Bot, Google Cloud, Grafana Cloud, Gridscale, HCP Terraform, Heroku AWS, Hetzner, Huawei Cloud, Infomaniak, Intercom, IONOS Cloud, Kamatera, Linode, Meta Crawler, Microsoft 365, Microsoft Azure, New Relic Synthetics, nForce, Okta, Online SAS, OpenAI, Open Telekom Cloud, Oracle Cloud, OVH, PagerDuty, Perplexity, Rackspace, Render, Salesforce Hyperforce, Scaleway, Seeweb, Sentry, SoftLayer IBM, Stripe, Telegram, Tencent, UCloud, UpCloud, Vercel, Vultr, Wasabi, Yandex, Yandex Cloud, Zendesk, Zscaler.
+## Providers
 
-## Invalid IP Addresses
+All active providers from [`disposable/cloud-ip-ranges`](https://github.com/disposable/cloud-ip-ranges) are supported.
 
-Invalid IP addresses passed to any lookup method throw `InvalidIpAddressException`.
+This currently includes cloud providers, hosting companies, CDNs, SaaS platforms, crawlers, payment services, security networks, and other known provider-owned ranges.
+
+`Provider::cases()` is the definitive supported-provider list.
 
 ## IP Range Data
 
-Provider ranges are bundled with the package. Only upstream rows whose `RetiredAt` value is
-empty are imported. The feed aggregates official, ASN/BGP-derived, and third-party sources.
-Detection performs no HTTP requests and does not depend on external services at runtime.
+Ranges are sourced from:
 
-A CIDR can belong to several providers. `belongsTo()` can therefore return `true` for multiple
-providers for one IP. `detectAll()` returns every provider sorted by normalized identifier.
-`detectOne()` returns the provider on the longest-prefix match, then the alphabetically first
-normalized provider identifier for a tie. This priority is independent of enum, CSV provider,
-and CSV row ordering.
+```text
+https://raw.githubusercontent.com/disposable/cloud-ip-ranges/refs/heads/master/csv/all-providers.csv
+```
 
-Refresh the bundled snapshot during development with:
+Only rows with an empty `RetiredAt` value are included.
+
+The upstream dataset combines official provider ranges with ASN/BGP-derived and third-party sources.
+
+No network requests are performed during detection.
+
+Refresh the bundled snapshot with:
 
 ```bash
 composer update:ranges
 ```
 
+## Invalid IP Addresses
+
+Invalid IP addresses passed to any lookup method throw `InvalidIpAddressException`.
+
 ## Performance
 
-| Lookup | Measured time |
-|---|---:|
-| Cloudflare hit | 0.002787 ms |
-| AWS hit | 0.008180 ms |
-| Unknown IP | 0.001207 ms |
-| Multi-provider hit | 0.004009 ms |
-
 PHPBench on PHP 8.5.10 with OPcache and Xdebug disabled.
+
+| Lookup             |        Time |
+| ------------------ | ----------: |
+| Cloudflare hit     | 0.002787 ms |
+| AWS hit            | 0.008180 ms |
+| Unknown IP         | 0.001207 ms |
+| Multi-provider hit | 0.004009 ms |
 
 ## Development
 
@@ -96,4 +122,4 @@ composer bench
 
 ## License
 
-Cloud IP Detector is open-source software licensed under the MIT license.
+MIT

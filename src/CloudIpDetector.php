@@ -5,17 +5,16 @@ declare(strict_types=1);
 namespace JacyImp\CloudIpDetector;
 
 use JacyImp\CloudIpDetector\Exception\InvalidIpAddressException;
-use JacyImp\CloudIpDetector\Internal\CidrMatcher;
 use JacyImp\CloudIpDetector\Internal\ProviderIpRanges;
 
 final class CloudIpDetector implements CloudIpDetectorInterface
 {
     public function detect(string $ip): ?Provider
     {
-        $this->assertValidIp($ip);
+        $packedIp = $this->packIp($ip);
 
         foreach (Provider::cases() as $provider) {
-            if ($this->belongsToProvider($ip, $provider)) {
+            if (ProviderIpRanges::contains($provider, $packedIp)) {
                 return $provider;
             }
         }
@@ -25,26 +24,23 @@ final class CloudIpDetector implements CloudIpDetectorInterface
 
     public function belongsTo(string $ip, Provider $provider): bool
     {
-        $this->assertValidIp($ip);
+        $packedIp = $this->packIp($ip);
 
-        return $this->belongsToProvider($ip, $provider);
+        return ProviderIpRanges::contains($provider, $packedIp);
     }
 
-    private function belongsToProvider(string $ip, Provider $provider): bool
-    {
-        foreach (ProviderIpRanges::for($provider) as $cidr) {
-            if (CidrMatcher::matches($ip, $cidr)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private function assertValidIp(string $ip): void
+    private function packIp(string $ip): string
     {
         if (filter_var($ip, FILTER_VALIDATE_IP) === false) {
             throw InvalidIpAddressException::for($ip);
         }
+
+        $packedIp = inet_pton($ip);
+
+        if ($packedIp === false) {
+            throw InvalidIpAddressException::for($ip);
+        }
+
+        return $packedIp;
     }
 }

@@ -14,11 +14,24 @@ final class ProviderIpRanges
     private static array $ranges = [];
 
     /**
+     * @var array<string, CompiledProviderRanges>
+     */
+    private static array $compiledRanges = [];
+
+    /**
      * @return list<string>
      */
     public static function for(Provider $provider): array
     {
         return self::$ranges[$provider->value] ??= self::load($provider);
+    }
+
+    public static function contains(Provider $provider, string $ip): bool
+    {
+        $ranges = self::$compiledRanges[$provider->value]
+            ??= CompiledProviderRanges::from(self::for($provider));
+
+        return $ranges->contains($ip);
     }
 
     /**

@@ -106,6 +106,16 @@ composer update:digital-ocean
 composer update:oracle-cloud
 ```
 
+## Performance
+
+| Lookup | Measured time |
+|---|---:|
+| Cloudflare hit | 0.642 μs |
+| AWS hit | 37.253 μs |
+| Unknown IP | 17.369 μs |
+
+PHPBench on PHP 8.4.22 with OPcache and Xdebug disabled.
+
 ## Development
 
 Run all checks:

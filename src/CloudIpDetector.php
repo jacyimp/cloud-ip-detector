@@ -6,20 +6,32 @@ namespace JacyImp\CloudIpDetector;
 
 use JacyImp\CloudIpDetector\Exception\InvalidIpAddressException;
 use JacyImp\CloudIpDetector\Internal\ProviderIpRanges;
+use JacyImp\CloudIpDetector\Internal\RangeMatchResolver;
 
 final class CloudIpDetector implements CloudIpDetectorInterface
 {
-    public function detect(string $ip): ?Provider
+    public function detectOne(string $ip): ?Provider
     {
         $packedIp = $this->packIp($ip);
 
-        foreach (Provider::cases() as $provider) {
-            if (ProviderIpRanges::contains($provider, $packedIp)) {
-                return $provider;
+        return RangeMatchResolver::resolve(ProviderIpRanges::matching($packedIp));
+    }
+
+    /** @return list<Provider> */
+    public function detectAll(string $ip): array
+    {
+        $packedIp = $this->packIp($ip);
+        $providers = [];
+
+        foreach (ProviderIpRanges::matching($packedIp) as $range) {
+            foreach ($range->providers() as $provider) {
+                $providers[$provider->value] = $provider;
             }
         }
 
-        return null;
+        ksort($providers, SORT_STRING);
+
+        return array_values($providers);
     }
 
     public function belongsTo(string $ip, Provider $provider): bool

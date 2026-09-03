@@ -13,6 +13,12 @@ use PHPUnit\Framework\TestCase;
 final class ProviderIpRangesTest extends TestCase
 {
     #[Test]
+    public function enumMatchesTheActiveProviderUniverse(): void
+    {
+        self::assertCount(76, Provider::cases());
+    }
+
+    #[Test]
     #[DataProvider('providers')]
     public function everyProviderHasIpRanges(Provider $provider): void
     {

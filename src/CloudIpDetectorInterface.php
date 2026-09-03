@@ -6,7 +6,10 @@ namespace JacyImp\CloudIpDetector;
 
 interface CloudIpDetectorInterface
 {
-    public function detect(string $ip): ?Provider;
+    public function detectOne(string $ip): ?Provider;
+
+    /** @return list<Provider> */
+    public function detectAll(string $ip): array;
 
     public function belongsTo(string $ip, Provider $provider): bool;
 }

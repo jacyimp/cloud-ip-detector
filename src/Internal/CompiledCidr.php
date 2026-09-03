@@ -9,6 +9,7 @@ final readonly class CompiledCidr
     private function __construct(
         private string $network,
         private int $packedLength,
+        private int $prefixLength,
         private int $wholePrefixBytes,
         private int $partialByteMask,
     ) {
@@ -41,6 +42,7 @@ final readonly class CompiledCidr
         return new self(
             $network,
             $packedLength,
+            $prefixLength,
             $wholePrefixBytes,
             $remainingPrefixBits === 0
                 ? 0
@@ -53,6 +55,15 @@ final readonly class CompiledCidr
         return $this->packedLength;
     }
 
+    public function network(): string
+    {
+        return $this->network;
+    }
+
+    public function prefixLength(): int
+    {
+        return $this->prefixLength;
+    }
     public function firstByte(): ?int
     {
         if ($this->wholePrefixBytes === 0) {

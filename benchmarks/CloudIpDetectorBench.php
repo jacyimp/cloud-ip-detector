@@ -21,18 +21,24 @@ final class CloudIpDetectorBench
     #[Bench\Revs(100)]
     public function benchCloudflareHit(): void
     {
-        $this->detector->detect('104.16.10.20');
+        $this->detector->detectOne('104.16.10.20');
     }
 
     #[Bench\Revs(10)]
     public function benchAwsHit(): void
     {
-        $this->detector->detect('3.5.140.1');
+        $this->detector->detectOne('3.5.140.1');
     }
 
     #[Bench\Revs(5)]
     public function benchUnknownIp(): void
     {
-        $this->detector->detect('192.0.2.1');
+        $this->detector->detectOne('192.0.2.1');
+    }
+
+    #[Bench\Revs(100)]
+    public function benchMultiProviderHit(): void
+    {
+        $this->detector->detectOne('1.178.4.1');
     }
 }

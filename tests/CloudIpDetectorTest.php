@@ -25,7 +25,7 @@ final class CloudIpDetectorTest extends TestCase
     {
         self::assertSame(
             Provider::Cloudflare,
-            $this->detector->detect('104.16.10.20'),
+            $this->detector->detectOne('104.16.10.20'),
         );
     }
 
@@ -34,7 +34,7 @@ final class CloudIpDetectorTest extends TestCase
     {
         self::assertSame(
             Provider::Cloudflare,
-            $this->detector->detect('2606:4700::1234'),
+            $this->detector->detectOne('2606:4700::1234'),
         );
     }
 
@@ -42,7 +42,7 @@ final class CloudIpDetectorTest extends TestCase
     public function itReturnsNullForUnknownInfrastructure(): void
     {
         self::assertNull(
-            $this->detector->detect('192.0.2.1'),
+            $this->detector->detectOne('192.0.2.1'),
         );
     }
 
@@ -65,29 +65,42 @@ final class CloudIpDetectorTest extends TestCase
     }
 
     #[Test]
+    public function itPreservesEveryMembershipOfAMultiProviderRange(): void
+    {
+        self::assertTrue($this->detector->belongsTo('1.178.4.1', Provider::Aws));
+        self::assertTrue($this->detector->belongsTo('1.178.4.1', Provider::HerokuAws));
+        self::assertSame(Provider::Aws, $this->detector->detectOne('1.178.4.1'));
+        self::assertSame(
+            [Provider::Aws, Provider::HerokuAws],
+            $this->detector->detectAll('1.178.4.1'),
+        );
+    }
+    #[Test]
     public function itDetectsGoogleCloudIpv4Infrastructure(): void
     {
         self::assertSame(
-            Provider::GoogleCloud,
-            $this->detector->detect('34.80.0.1'),
+            Provider::Datadog,
+            $this->detector->detectOne('34.80.0.1'),
         );
+        self::assertTrue($this->detector->belongsTo('34.80.0.1', Provider::GoogleCloud));
     }
 
     #[Test]
     public function itDetectsGoogleCloudIpv6Infrastructure(): void
     {
         self::assertSame(
-            Provider::GoogleCloud,
-            $this->detector->detect('2600:1900:8000::1'),
+            Provider::GoogleBot,
+            $this->detector->detectOne('2600:1900:8000::1'),
         );
+        self::assertTrue($this->detector->belongsTo('2600:1900:8000::1', Provider::GoogleCloud));
     }
 
     #[Test]
     public function itDetectsAzureInfrastructure(): void
     {
         self::assertSame(
-            Provider::Azure,
-            $this->detector->detect('102.133.0.0'),
+            Provider::MicrosoftAzure,
+            $this->detector->detectOne('102.133.0.0'),
         );
     }
 
@@ -96,7 +109,7 @@ final class CloudIpDetectorTest extends TestCase
     {
         self::assertSame(
             Provider::Fastly,
-            $this->detector->detect('151.101.1.1'),
+            $this->detector->detectOne('151.101.1.1'),
         );
     }
 
@@ -105,7 +118,7 @@ final class CloudIpDetectorTest extends TestCase
     {
         self::assertSame(
             Provider::Fastly,
-            $this->detector->detect('2a04:4e40::1'),
+            $this->detector->detectOne('2a04:4e40::1'),
         );
     }
 
@@ -114,7 +127,7 @@ final class CloudIpDetectorTest extends TestCase
     {
         self::assertSame(
             Provider::DigitalOcean,
-            $this->detector->detect('104.131.0.1'),
+            $this->detector->detectOne('104.131.0.1'),
         );
     }
 
@@ -123,7 +136,7 @@ final class CloudIpDetectorTest extends TestCase
     {
         self::assertSame(
             Provider::DigitalOcean,
-            $this->detector->detect('2604:a880:800:10::17d:2001'),
+            $this->detector->detectOne('2604:a880:800:10::17d:2001'),
         );
     }
 
@@ -135,7 +148,7 @@ final class CloudIpDetectorTest extends TestCase
     ): void {
         self::assertSame(
             $provider,
-            $this->detector->detect($ip),
+            $this->detector->detectOne($ip),
         );
 
         self::assertTrue(
@@ -158,14 +171,9 @@ final class CloudIpDetectorTest extends TestCase
             Provider::Aws,
         ];
 
-        yield 'google-cloud' => [
-            '34.80.0.1',
-            Provider::GoogleCloud,
-        ];
-
         yield 'azure' => [
             '102.133.0.0',
-            Provider::Azure,
+            Provider::MicrosoftAzure,
         ];
 
         yield 'fastly' => [
@@ -184,7 +192,7 @@ final class CloudIpDetectorTest extends TestCase
         $this->expectException(InvalidIpAddressException::class);
         $this->expectExceptionMessage('Invalid IP address "not-an-ip".');
 
-        $this->detector->detect('not-an-ip');
+        $this->detector->detectOne('not-an-ip');
     }
 
     #[Test]
@@ -192,7 +200,7 @@ final class CloudIpDetectorTest extends TestCase
     {
         self::assertSame(
             Provider::Aws,
-            $this->detector->detect('3.5.140.1'),
+            $this->detector->detectOne('3.5.140.1'),
         );
     }
 
@@ -201,7 +209,7 @@ final class CloudIpDetectorTest extends TestCase
     {
         self::assertSame(
             Provider::OracleCloud,
-            $this->detector->detect('40.233.0.1'),
+            $this->detector->detectOne('40.233.0.1'),
         );
     }
 
@@ -210,7 +218,7 @@ final class CloudIpDetectorTest extends TestCase
     {
         self::assertSame(
             Provider::OracleCloud,
-            $this->detector->detect('2603:c028:8000::1'),
+            $this->detector->detectOne('2603:c028:8000::1'),
         );
     }
 
@@ -219,7 +227,7 @@ final class CloudIpDetectorTest extends TestCase
     {
         self::assertSame(
             Provider::Aws,
-            $this->detector->detect('2a05:d07c:2000::1'),
+            $this->detector->detectOne('2a05:d07c:2000::1'),
         );
     }
 }

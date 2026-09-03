@@ -8,46 +8,54 @@ use JacyImp\CloudIpDetector\Provider;
 
 final class ProviderIpRanges
 {
-    /**
-     * @var array<string, list<string>>
-     */
-    private static array $ranges = [];
+    /** @var list<array{string, non-empty-list<string>}>|null */
+    private static ?array $ranges = null;
 
-    /**
-     * @var array<string, CompiledProviderRanges>
-     */
-    private static array $compiledRanges = [];
+    private static ?CompiledRanges $compiled = null;
 
-    /**
-     * @return list<string>
-     */
+    /** @return list<string> */
     public static function for(Provider $provider): array
     {
-        return self::$ranges[$provider->value] ??= self::load($provider);
+        $ranges = [];
+
+        foreach (self::ranges() as [$cidr, $providers]) {
+            if (in_array($provider->value, $providers, true)) {
+                $ranges[] = $cidr;
+            }
+        }
+
+        return $ranges;
+    }
+
+    /** @return list<CompiledRange> */
+    public static function matching(string $ip): array
+    {
+        self::$compiled ??= CompiledRanges::from(self::ranges());
+
+        return self::$compiled->matching($ip);
     }
 
     public static function contains(Provider $provider, string $ip): bool
     {
-        $ranges = self::$compiledRanges[$provider->value]
-            ??= CompiledProviderRanges::from(self::for($provider));
+        foreach (self::matching($ip) as $range) {
+            if (in_array($provider, $range->providers(), true)) {
+                return true;
+            }
+        }
 
-        return $ranges->contains($ip);
+        return false;
     }
 
-    /**
-     * @return list<string>
-     */
-    private static function load(Provider $provider): array
+    /** @return list<array{string, non-empty-list<string>}> */
+    private static function ranges(): array
     {
-        $name = str_replace('_', '-', $provider->value);
+        if (self::$ranges !== null) {
+            return self::$ranges;
+        }
 
-        /** @var list<string> $ranges */
-        $ranges = require sprintf(
-            '%s/../../resources/ip-ranges/%s.php',
-            __DIR__,
-            $name,
-        );
+        /** @var list<array{string, non-empty-list<string>}> $ranges */
+        $ranges = require __DIR__ . '/../../resources/ip-ranges.php';
 
-        return $ranges;
+        return self::$ranges = $ranges;
     }
 }

@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+* Migrate range ingestion to the consolidated `disposable/cloud-ip-ranges` CSV.
+* Expand the provider enum to every provider identifier represented by active feed rows.
+* Preserve multiple provider memberships for shared and overlapping ranges.
+* Ignore every row with a populated `RetiredAt` value.
+* Replace provider-specific update tooling with one `composer update:ranges` command.
+* Replace singular `detect()` with `detectOne()` and add `detectAll()` for all matches.
+
 ## [0.1.0] - 2026-09-03
 
 ### Added

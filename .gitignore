@@ -2,3 +2,4 @@ vendor
 .idea
 .phpunit.cache
 var
+composer.lock

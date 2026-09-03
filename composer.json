@@ -33,6 +33,10 @@
     "bench": "phpbench run --report=aggregate",
     "bench:baseline": "phpbench run --tag=baseline --report=aggregate",
     "test": "phpunit",
+    "test:coverage": [
+      "phpunit --coverage-clover var/coverage.xml",
+      "@php tools/assert-full-coverage.php var/coverage.xml"
+    ],
     "phpstan": "phpstan analyse",
     "phpcs": "phpcs",
     "update:ranges": "php tools/update-ip-ranges.php",

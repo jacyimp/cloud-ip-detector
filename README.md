@@ -1,5 +1,8 @@
 # Cloud IP Detector
 
+[![Coverage: 100%](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://github.com/jacyimp/cloud-ip-detector/actions/workflows/ci.yml)
+[![PHPStan: max level](https://img.shields.io/badge/PHPStan-max%20level-brightgreen.svg)](https://github.com/jacyimp/cloud-ip-detector/actions/workflows/ci.yml)
+
 Identify known provider and service network ownership associated with an IP address.
 
 The package works entirely offline using a bundled snapshot of the consolidated

@@ -11,6 +11,21 @@ use PHPUnit\Framework\TestCase;
 final class CidrMatcherTest extends TestCase
 {
     #[Test]
+    public function itRejectsAnInvalidIpAddress(): void
+    {
+        self::assertFalse(CidrMatcher::matches('not-an-ip', '10.0.0.0/8'));
+    }
+
+    #[Test]
+    public function itRejectsMalformedCidrs(): void
+    {
+        self::assertFalse(CidrMatcher::matches('10.0.0.1', '10.0.0.0'));
+        self::assertFalse(CidrMatcher::matches('10.0.0.1', 'not-an-ip/8'));
+        self::assertFalse(CidrMatcher::matches('10.0.0.1', '10.0.0.0/-1'));
+        self::assertFalse(CidrMatcher::matches('10.0.0.1', '10.0.0.0/33'));
+    }
+
+    #[Test]
     public function itMatchesAnIpv4AddressInsideARange(): void
     {
         self::assertTrue(

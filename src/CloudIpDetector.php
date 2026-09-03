@@ -47,11 +47,8 @@ final class CloudIpDetector implements CloudIpDetectorInterface
             throw InvalidIpAddressException::for($ip);
         }
 
+        /** @var string $packedIp The IP was validated above. */
         $packedIp = inet_pton($ip);
-
-        if ($packedIp === false) {
-            throw InvalidIpAddressException::for($ip);
-        }
 
         return $packedIp;
     }

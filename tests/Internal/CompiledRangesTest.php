@@ -20,12 +20,14 @@ final class CompiledRangesTest extends TestCase
             ['10.0.0.0/8', [Provider::Aws->value]],
             ['10.1.0.0/16', [Provider::Stripe->value]],
         ]);
+        $ip = inet_pton('10.1.2.3');
+        self::assertIsString($ip);
 
         self::assertSame(
             [Provider::Stripe, Provider::Aws, Provider::Cloudflare],
             array_map(
                 static fn ($range): Provider => $range->providers()[0],
-                $ranges->matching(inet_pton('10.1.2.3')),
+                $ranges->matching($ip),
             ),
         );
     }

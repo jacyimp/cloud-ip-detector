@@ -2,9 +2,6 @@
 
 declare(strict_types=1);
 
-use RuntimeException;
-use SimpleXMLElement;
-
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 $report = $argv[1] ?? null;

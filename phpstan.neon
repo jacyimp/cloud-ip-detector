@@ -4,5 +4,6 @@ parameters:
     paths:
         - src
         - tests
+        - tools
 
     tmpDir: var/phpstan

@@ -9,18 +9,32 @@ use JacyImp\CloudIpDetector\Provider;
 final class ProviderIpRanges
 {
     /**
+     * @var array<string, list<string>>
+     */
+    private static array $ranges = [];
+
+    /**
      * @return list<string>
      */
     public static function for(Provider $provider): array
     {
-        return match ($provider) {
-            Provider::Cloudflare => CloudflareIpRanges::all(),
-            Provider::Aws => AwsIpRanges::all(),
-            Provider::GoogleCloud => GoogleCloudIpRanges::all(),
-            Provider::Azure => AzureIpRanges::all(),
-            Provider::Fastly => FastlyIpRanges::all(),
-            Provider::DigitalOcean => DigitalOceanIpRanges::all(),
-            Provider::OracleCloud => OracleCloudIpRanges::all(),
-        };
+        return self::$ranges[$provider->value] ??= self::load($provider);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function load(Provider $provider): array
+    {
+        $name = str_replace('_', '-', $provider->value);
+
+        /** @var list<string> $ranges */
+        $ranges = require sprintf(
+            '%s/../../resources/ip-ranges/%s.php',
+            __DIR__,
+            $name,
+        );
+
+        return $ranges;
     }
 }

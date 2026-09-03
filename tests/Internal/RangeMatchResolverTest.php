@@ -31,6 +31,15 @@ final class RangeMatchResolverTest extends TestCase
         self::assertSame(Provider::Aws, RangeMatchResolver::resolve([$range]));
     }
 
+    #[Test]
+    public function aZeroLengthPrefixCanWin(): void
+    {
+        self::assertSame(
+            Provider::Aws,
+            RangeMatchResolver::resolve([$this->range('0.0.0.0/0', Provider::Aws)]),
+        );
+    }
+
     private function range(
         string $cidr,
         Provider $provider,

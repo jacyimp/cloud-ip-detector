@@ -9,6 +9,7 @@ use JacyImp\CloudIpDetector\Provider;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 
 final class ProviderIpRangesTest extends TestCase
 {
@@ -46,6 +47,22 @@ final class ProviderIpRangesTest extends TestCase
             count($ranges),
             count(array_unique($ranges)),
         );
+    }
+
+    #[Test]
+    public function compiledRangesAreCached(): void
+    {
+        $compiled = new ReflectionProperty(ProviderIpRanges::class, 'compiled');
+        $compiled->setValue(null, null);
+
+        $ip = inet_pton('192.0.2.1');
+        self::assertIsString($ip);
+
+        ProviderIpRanges::matching($ip);
+        $firstCompilation = $compiled->getValue();
+        ProviderIpRanges::matching($ip);
+
+        self::assertSame($firstCompilation, $compiled->getValue());
     }
 
     /**

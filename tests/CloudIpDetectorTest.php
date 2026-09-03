@@ -7,9 +7,12 @@ namespace JacyImp\CloudIpDetector\Tests;
 use JacyImp\CloudIpDetector\CloudIpDetector;
 use JacyImp\CloudIpDetector\Exception\InvalidIpAddressException;
 use JacyImp\CloudIpDetector\Provider;
+use JacyImp\CloudIpDetector\Internal\CompiledRanges;
+use JacyImp\CloudIpDetector\Internal\ProviderIpRanges;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 
 final class CloudIpDetectorTest extends TestCase
 {
@@ -74,6 +77,25 @@ final class CloudIpDetectorTest extends TestCase
             [Provider::Aws, Provider::HerokuAws],
             $this->detector->detectAll('1.178.4.1'),
         );
+    }
+
+    #[Test]
+    public function itSortsAllDetectedProvidersByIdentifier(): void
+    {
+        $compiled = new ReflectionProperty(ProviderIpRanges::class, 'compiled');
+        $original = $compiled->getValue();
+        $compiled->setValue(null, CompiledRanges::from([
+            ['0.0.0.0/0', [Provider::Stripe->value, Provider::Aws->value]],
+        ]));
+
+        try {
+            self::assertSame(
+                [Provider::Aws, Provider::Stripe],
+                $this->detector->detectAll('192.0.2.1'),
+            );
+        } finally {
+            $compiled->setValue(null, $original);
+        }
     }
     #[Test]
     public function itDetectsGoogleCloudIpv4Infrastructure(): void

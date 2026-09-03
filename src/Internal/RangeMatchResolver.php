@@ -12,16 +12,17 @@ final class RangeMatchResolver
     public static function resolve(array $ranges): ?Provider
     {
         $bestProvider = null;
-        $bestPrefixLength = -1;
+        $bestPrefixLength = null;
 
         foreach ($ranges as $range) {
             foreach ($range->providers() as $provider) {
                 if (
-                    $range->prefixLength() > $bestPrefixLength
+                    $bestPrefixLength === null
+                    || $range->prefixLength() > $bestPrefixLength
                     || (
                         $range->prefixLength() === $bestPrefixLength
                         && $bestProvider !== null
-                        && ProviderPriority::compare($provider, $bestProvider) < 0
+                        && ProviderPriority::compare($provider, $bestProvider) === -1
                     )
                 ) {
                     $bestProvider = $provider;

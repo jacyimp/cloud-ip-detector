@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace JacyImp\CloudIpDetector\Tests\Internal;
 
 use JacyImp\CloudIpDetector\Internal\CidrMatcher;
+use JacyImp\CloudIpDetector\Internal\CompiledCidr;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -23,6 +24,24 @@ final class CidrMatcherTest extends TestCase
         self::assertFalse(CidrMatcher::matches('10.0.0.1', 'not-an-ip/8'));
         self::assertFalse(CidrMatcher::matches('10.0.0.1', '10.0.0.0/-1'));
         self::assertFalse(CidrMatcher::matches('10.0.0.1', '10.0.0.0/33'));
+    }
+
+    #[Test]
+    public function itRejectsPrefixesBeyondTheAddressWidth(): void
+    {
+        self::assertNull(CompiledCidr::from('10.0.0.0/33'));
+        self::assertNull(CompiledCidr::from('2001:db8::/129'));
+    }
+
+    #[Test]
+    public function aZeroLengthPrefixStillRejectsTheOtherIpVersion(): void
+    {
+        $ipv4Range = CompiledCidr::from('0.0.0.0/0');
+        self::assertNotNull($ipv4Range);
+
+        $ipv6 = inet_pton('::1');
+        self::assertIsString($ipv6);
+        self::assertFalse($ipv4Range->matches($ipv6));
     }
 
     #[Test]

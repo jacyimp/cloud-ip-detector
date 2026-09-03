@@ -1,6 +1,7 @@
 # Cloud IP Detector
 
 [![Coverage: 100%](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://github.com/jacyimp/cloud-ip-detector/actions/workflows/ci.yml)
+[![Infection MSI: 100%](https://img.shields.io/badge/Infection%20MSI-100%25-brightgreen.svg)](https://github.com/jacyimp/cloud-ip-detector/actions/workflows/ci.yml)
 [![PHPStan: max level](https://img.shields.io/badge/PHPStan-max%20level-brightgreen.svg)](https://github.com/jacyimp/cloud-ip-detector/actions/workflows/ci.yml)
 
 Identify known provider and service networks behind an IP address.
@@ -119,6 +120,7 @@ PHPBench on PHP 8.5.10 with OPcache and Xdebug disabled.
 
 ```bash
 composer check
+composer infection
 composer bench
 ```
 

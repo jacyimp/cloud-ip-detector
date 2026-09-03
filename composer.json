@@ -12,6 +12,7 @@
     "php": "^8.2"
   },
   "require-dev": {
+    "infection/infection": "^0.35",
     "phpbench/phpbench": "^1.7",
     "phpstan/phpstan": "^2.1",
     "phpunit/phpunit": "^11.5",
@@ -39,6 +40,7 @@
     ],
     "phpstan": "phpstan analyse",
     "phpcs": "phpcs",
+    "infection": "infection --threads=max --no-interaction",
     "update:ranges": "php tools/update-ip-ranges.php",
     "check": [
       "@phpcs",

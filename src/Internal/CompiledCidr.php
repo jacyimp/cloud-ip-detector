@@ -44,9 +44,7 @@ final readonly class CompiledCidr
             $packedLength,
             $prefixLength,
             $wholePrefixBytes,
-            $remainingPrefixBits === 0
-                ? 0
-                : (0xFF << (8 - $remainingPrefixBits)) & 0xFF,
+            (0xFF << (8 - $remainingPrefixBits)) & 0xFF,
         );
     }
 
@@ -80,8 +78,7 @@ final readonly class CompiledCidr
         }
 
         if (
-            $this->wholePrefixBytes > 0
-            && strncmp($ip, $this->network, $this->wholePrefixBytes) !== 0
+            strncmp($ip, $this->network, $this->wholePrefixBytes) !== 0
         ) {
             return false;
         }

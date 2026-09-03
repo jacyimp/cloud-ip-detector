@@ -1,0 +1,61 @@
+{
+  "name": "jacyimp/cloud-ip-detector",
+  "description": "Detect which known cloud or infrastructure provider owns an IP address.",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "JacyImp"
+    }
+  ],
+  "require": {
+    "php": "^8.2"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^2.1",
+    "phpunit/phpunit": "^11.0 || ^12.0",
+    "squizlabs/php_codesniffer": "^3.13"
+  },
+  "autoload": {
+    "psr-4": {
+      "JacyImp\\CloudIpDetector\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "JacyImp\\CloudIpDetector\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "phpunit",
+    "phpstan": "phpstan analyse",
+    "phpcs": "phpcs",
+    "update:aws": "php tools/update-aws-ip-ranges.php",
+    "update:google-cloud": "php tools/update-google-cloud-ip-ranges.php",
+    "update:azure": "php tools/update-azure-ip-ranges.php",
+    "update:fastly": "php tools/update-fastly-ip-ranges.php",
+    "update:digital-ocean": "php tools/update-digital-ocean-ip-ranges.php",
+    "update:cloudflare": "php tools/update-cloudflare-ip-ranges.php",
+    "update:oracle-cloud": "php tools/update-oracle-cloud-ip-ranges.php",
+    "update:ranges": [
+      "@update:cloudflare",
+      "@update:aws",
+      "@update:google-cloud",
+      "@update:azure",
+      "@update:fastly",
+      "@update:digital-ocean",
+      "@update:oracle-cloud"
+    ],
+    "check": [
+      "@phpcs",
+      "@phpstan",
+      "@test"
+    ]
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": false
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}

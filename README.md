@@ -74,7 +74,9 @@ final class RequestClassifier
 
 All active providers from [`disposable/cloud-ip-ranges`](https://github.com/disposable/cloud-ip-ranges) are supported.
 
-This currently includes cloud providers, hosting companies, CDNs, SaaS platforms, crawlers, payment services, security networks, and other known provider-owned ranges.
+Current provider coverage includes:
+
+A2 Hosting, Adyen, Ahrefs, Akamai, Alibaba, Apple Private Relay, Aruba Cloud, Atlassian, AWS, Backblaze, Bing Bot, Branch, Bunny CDN, Bunny Magic Containers, Choopa, CircleCI, Cisco Webex, Cloudflare, Cyso Cloud, Datadog, DigitalOcean, DreamHost, Equinix Metal, Exoscale, Fastly, Fly.io, Gcore CDN, Gcore Cloud, GitHub, GitLab, GoDaddy, Google Bot, Google Cloud, Grafana Cloud, Gridscale, HCP Terraform, Heroku AWS, Hetzner, Huawei Cloud, Infomaniak, Intercom, IONOS Cloud, Kamatera, Linode, Meta Crawler, Microsoft 365, Microsoft Azure, New Relic Synthetics, nForce, Okta, Online SAS, OpenAI, Open Telekom Cloud, Oracle Cloud, OVH, PagerDuty, Perplexity, Rackspace, Render, Salesforce Hyperforce, Scaleway, Seeweb, Sentry, SoftLayer IBM, Stripe, Telegram, Tencent, UCloud, UpCloud, Vercel, Vultr, Wasabi, Yandex, Yandex Cloud, Zendesk, and Zscaler.
 
 `Provider::cases()` is the definitive supported-provider list.
 

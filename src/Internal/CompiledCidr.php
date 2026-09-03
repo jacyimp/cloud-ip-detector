@@ -44,7 +44,7 @@ final readonly class CompiledCidr
             $packedLength,
             $prefixLength,
             $wholePrefixBytes,
-            (0xFF << (8 - $remainingPrefixBits)) & 0xFF,
+            (0xFF << (8 - $remainingPrefixBits)) % 256,
         );
     }
 

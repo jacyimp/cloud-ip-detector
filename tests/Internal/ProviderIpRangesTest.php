@@ -29,6 +29,12 @@ final class ProviderIpRangesTest extends TestCase
     }
 
     #[Test]
+    public function providersWithMultipleRangesRetainEveryRange(): void
+    {
+        self::assertGreaterThan(1, count(ProviderIpRanges::for(Provider::Cloudflare)));
+    }
+
+    #[Test]
     #[DataProvider('providers')]
     public function everyProviderRangeIsAValidCidr(Provider $provider): void
     {
